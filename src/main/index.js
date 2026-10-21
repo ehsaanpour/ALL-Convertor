@@ -86,9 +86,16 @@ class TangerineApp {
   }
 
   setupHookListeners() {
+    // Pre-fetch active Explorer selection when drag starts
+    this.hookManager.on('drag_start', () => {
+      explorerInterop.getSelectedFiles().catch(() => {});
+    });
+
     // When modifier is pressed during drag or triggered
     this.hookManager.on('trigger', async (data) => {
-      await this.displayRadialWheel(data.mode, { x: data.x, y: data.y });
+      const cursor = screen.getCursorScreenPoint();
+      const coords = { x: (data && data.x > 0) ? data.x : cursor.x, y: (data && data.y > 0) ? data.y : cursor.y };
+      await this.displayRadialWheel(data.mode, coords);
     });
 
     // Fallback summon via hotkey
@@ -105,14 +112,16 @@ class TangerineApp {
     });
   }
 
-  async displayRadialWheel(mode, coords) {
+  async displayRadialWheel(mode, coords, explicitFiles = null) {
     if (!this.overlayWindow) return;
 
-    // Query active files from Windows Explorer
-    const selectedFiles = await explorerInterop.getSelectedFiles();
+    // Use explicitFiles if provided, otherwise query active files from Windows Explorer
+    let activeFiles = explicitFiles;
+    if (!activeFiles || !activeFiles.length) {
+      const selectedFiles = await explorerInterop.getSelectedFiles();
+      activeFiles = selectedFiles.length > 0 ? selectedFiles : [this.getFallbackSampleFile()];
+    }
 
-    // If no files selected (e.g. testing), create or use a sample file
-    const activeFiles = selectedFiles.length > 0 ? selectedFiles : [this.getFallbackSampleFile()];
     const firstFile = activeFiles[0];
     const ext = normalizeExtension(path.extname(firstFile));
 
@@ -130,19 +139,31 @@ class TangerineApp {
       labels = targets.map((a) => i18n.t(`actions.${a}.title`));
     }
 
-    if (!targets.length) {
-      // If no conversions/tools, switch to actions or conversions
-      targets = mode === 'actions' ? getFileActions() : getConversionTargets(ext);
-      labels = targets.map((t) => t.toUpperCase());
+    // Fallback: If targets is empty (e.g. non-convertible file format or empty selection), NEVER show an empty wheel!
+    if (!targets || !targets.length) {
+      if (mode === 'actions') {
+        targets = getFileActions();
+        labels = targets.map((a) => i18n.t(`actions.${a}.title`));
+      } else if (mode === 'tools') {
+        targets = getToolsForFile('jpg', activeFiles.length);
+        labels = targets.map((t) => i18n.t(`tools.${t}.title`));
+      } else {
+        targets = getConversionTargets('jpg');
+        labels = targets.map((t) => t.toUpperCase());
+      }
     }
+
+    const cursor = screen.getCursorScreenPoint();
+    const posX = (coords && coords.x > 0) ? coords.x : cursor.x;
+    const posY = (coords && coords.y > 0) ? coords.y : cursor.y;
 
     const payload = {
       mode,
       targets,
       labels,
       files: activeFiles,
-      x: coords.x || 400,
-      y: coords.y || 400,
+      x: posX,
+      y: posY,
       theme: configStore.get('theme') || 'system',
       locale: i18n.getLocale(),
       isRtl: i18n.isRtl(),
@@ -213,6 +234,11 @@ class TangerineApp {
     ipcMain.on('test-radial-wheel', () => {
       this.showTestOverlay();
     });
+
+    ipcMain.on('switch-wheel-mode', (event, newMode) => {
+      const cursor = screen.getCursorScreenPoint();
+      this.displayRadialWheel(newMode, cursor);
+    });
   }
 
   openSettingsWindow() {
@@ -252,7 +278,7 @@ class TangerineApp {
 
   showTestOverlay() {
     const cursor = screen.getCursorScreenPoint();
-    this.displayRadialWheel('conversions', cursor);
+    this.displayRadialWheel('conversions', cursor, [this.getFallbackSampleFile()]);
   }
 
   changeLanguage(lang) {

@@ -192,9 +192,23 @@ window.addEventListener('mouseup', () => {
   }
 });
 
+promptBanner.querySelectorAll('.tab-btn').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const mode = btn.dataset.mode;
+    ipcRenderer.send('switch-wheel-mode', mode);
+  });
+});
+
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     radialWrapper.classList.add('hidden');
     ipcRenderer.send('hide-overlay-window');
+  } else if (e.key === 'Shift') {
+    ipcRenderer.send('switch-wheel-mode', 'conversions');
+  } else if (e.key === 'Alt') {
+    ipcRenderer.send('switch-wheel-mode', 'tools');
+  } else if (e.key === 'Control') {
+    ipcRenderer.send('switch-wheel-mode', 'actions');
   }
 });

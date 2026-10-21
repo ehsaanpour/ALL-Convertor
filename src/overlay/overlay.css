@@ -189,8 +189,22 @@ body.theme-dark .wheel-prompt-banner {
   margin: 0 2px;
 }
 
-body.theme-dark .wheel-prompt-banner kbd {
-  background: rgba(255, 255, 255, 0.12);
+.wheel-prompt-banner .tab-btn {
+  display: inline-block;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.wheel-prompt-banner .tab-btn:hover {
+  background: rgba(255, 106, 0, 0.2);
+  color: #ff6a00;
+}
+
+body.theme-dark .wheel-prompt-banner .tab-btn:hover {
+  background: rgba(255, 140, 0, 0.28);
+  color: #ffa149;
 }
 
 /* Persian / RTL Specific Rules */

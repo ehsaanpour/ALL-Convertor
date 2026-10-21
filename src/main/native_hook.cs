@@ -19,9 +19,17 @@ namespace TangerineNativeHook
         private const int WM_SYSKEYDOWN = 0x0104;
         private const int WM_SYSKEYUP = 0x0105;
 
+        // Virtual Key Codes (generic and left/right specific)
         private const int VK_SHIFT = 0x10;
         private const int VK_CONTROL = 0x11;
         private const int VK_MENU = 0x12; // Alt key
+
+        private const int VK_LSHIFT = 0xA0;
+        private const int VK_RSHIFT = 0xA1;
+        private const int VK_LCONTROL = 0xA2;
+        private const int VK_RCONTROL = 0xA3;
+        private const int VK_LMENU = 0xA4;
+        private const int VK_RMENU = 0xA5;
 
         private static LowLevelMouseProc _mouseProc = MouseHookCallback;
         private static LowLevelKeyboardProc _keyboardProc = KeyboardHookCallback;
@@ -34,7 +42,7 @@ namespace TangerineNativeHook
         private static int _currentX = 0;
         private static int _currentY = 0;
         private static bool _isDragging = false;
-        private static int _dragThreshold = 8;
+        private static int _dragThreshold = 4; // Lower threshold to 4px for higher responsiveness
 
         static void Main(string[] args)
         {
@@ -139,23 +147,31 @@ namespace TangerineNativeHook
                 if (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
                 {
                     string key = null;
-                    if (vkCode == VK_SHIFT) key = "Shift";
-                    else if (vkCode == VK_MENU) key = "Alt";
-                    else if (vkCode == VK_CONTROL) key = "Control";
+                    if (vkCode == VK_SHIFT || vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) key = "Shift";
+                    else if (vkCode == VK_MENU || vkCode == VK_LMENU || vkCode == VK_RMENU) key = "Alt";
+                    else if (vkCode == VK_CONTROL || vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) key = "Control";
 
                     if (key != null)
                     {
+                        POINT curPt;
+                        if (GetCursorPos(out curPt))
+                        {
+                            _currentX = curPt.x;
+                            _currentY = curPt.y;
+                        }
+
+                        bool userIsDragging = _isDragging || _isLeftMouseDown;
                         Console.WriteLine(string.Format("{{\"event\":\"key_down\",\"key\":\"{0}\",\"dragging\":{1},\"x\":{2},\"y\":{3}}}",
-                            key, _isDragging ? "true" : "false", _currentX, _currentY));
+                            key, userIsDragging ? "true" : "false", _currentX, _currentY));
                         Console.Out.Flush();
                     }
                 }
                 else if (msg == WM_KEYUP || msg == WM_SYSKEYUP)
                 {
                     string key = null;
-                    if (vkCode == VK_SHIFT) key = "Shift";
-                    else if (vkCode == VK_MENU) key = "Alt";
-                    else if (vkCode == VK_CONTROL) key = "Control";
+                    if (vkCode == VK_SHIFT || vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) key = "Shift";
+                    else if (vkCode == VK_MENU || vkCode == VK_LMENU || vkCode == VK_RMENU) key = "Alt";
+                    else if (vkCode == VK_CONTROL || vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) key = "Control";
 
                     if (key != null)
                     {
@@ -183,6 +199,9 @@ namespace TangerineNativeHook
             public uint time;
             public IntPtr dwExtraInfo;
         }
+
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out POINT lpPoint);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
