@@ -46,7 +46,7 @@ jobs:
           cache: 'npm'
 
       - name: Install NPM Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Compile C# Native Low-Level Hook
         run: npm run build:native
@@ -85,23 +85,12 @@ jobs:
       - name: Create Release Directory
         run: New-Item -ItemType Directory -Path release_assets -Force
 
-      - name: Download Windows x64 Artifacts
+      - name: Download All Windows Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: uniflux-windows-x64
+          pattern: uniflux-windows-*
           path: release_assets
-
-      - name: Download Windows ia32 Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: uniflux-windows-ia32
-          path: release_assets
-
-      - name: Download Windows arm64 Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: uniflux-windows-arm64
-          path: release_assets
+          merge-multiple: true
 
       - name: Compute Cryptographic SHA256 Checksums
         id: checksums
