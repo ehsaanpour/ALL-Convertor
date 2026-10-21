@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tangerine Radial Overlay</title>
+  <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+  <div id="overlay-container">
+    <div id="radial-wrapper" class="radial-wrapper hidden">
+      <div id="prompt-banner" class="wheel-prompt-banner">
+        <span><kbd>⇧</kbd> Convert</span>
+        <span><kbd>⌥</kbd> Tools</span>
+        <span><kbd>⌃</kbd> Actions</span>
+      </div>
+      <div class="fan-glass"></div>
+      <svg id="radial-svg" viewBox="-136 -136 272 272">
+        <defs>
+          <radialGradient id="glass-fill">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
+            <stop offset="0.68" stop-color="#f3f6f7" stop-opacity="0.75" />
+            <stop offset="1" stop-color="#f4f6f6" stop-opacity="0.88" />
+          </radialGradient>
+        </defs>
+        <g id="petals-group"></g>
+      </svg>
+      <div id="center-label" class="fan-center-label">TANGERINE</div>
+    </div>
+  </div>
+
+  <script src="audio-ticks.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>

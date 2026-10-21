@@ -1,0 +1,208 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif;
+  color: #1a1a1a;
+}
+
+#overlay-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Central Radial Glass Disk */
+.radial-wrapper {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.16)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+.radial-wrapper.hidden {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.92);
+  pointer-events: none;
+}
+
+.fan-glass {
+  position: absolute;
+  width: 272px;
+  height: 272px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.88) 0%, rgba(243, 246, 247, 0.72) 68%, rgba(238, 242, 243, 0.82) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.04);
+  z-index: 1;
+}
+
+/* Dark Theme Support */
+body.theme-dark .fan-glass {
+  background: radial-gradient(circle, rgba(38, 40, 44, 0.88) 0%, rgba(28, 30, 34, 0.82) 68%, rgba(22, 24, 28, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f0f0f0;
+}
+
+#radial-svg {
+  position: absolute;
+  width: 272px;
+  height: 272px;
+  z-index: 2;
+  overflow: visible;
+}
+
+/* SVG Petal Styling */
+.petal {
+  fill: rgba(255, 255, 255, 0.55);
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 1px;
+  cursor: pointer;
+  transition: fill 0.12s ease, transform 0.12s ease, filter 0.12s ease;
+  transform-origin: 0 0;
+}
+
+body.theme-dark .petal {
+  fill: rgba(255, 255, 255, 0.08);
+  stroke: rgba(255, 255, 255, 0.14);
+}
+
+.fan-target {
+  cursor: pointer;
+}
+
+.fan-target:hover .petal,
+.fan-target.is-highlighted .petal {
+  fill: rgba(255, 255, 255, 0.96);
+  stroke: rgba(255, 122, 0, 0.7);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 2px 8px rgba(255, 106, 0, 0.28));
+}
+
+body.theme-dark .fan-target:hover .petal,
+body.theme-dark .fan-target.is-highlighted .petal {
+  fill: rgba(255, 255, 255, 0.24);
+  stroke: rgba(255, 140, 0, 0.85);
+}
+
+/* Labels on Petals */
+.petal-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  fill: #222222;
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+body.theme-dark .petal-label {
+  fill: #e8e8e8;
+}
+
+.fan-target.is-highlighted .petal-label {
+  fill: #ff6a00;
+  font-weight: 700;
+}
+
+/* Center Status Label */
+.fan-center-label {
+  position: absolute;
+  z-index: 3;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #ff6a00;
+  text-transform: uppercase;
+  pointer-events: none;
+  padding: 8px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 248, 0.85) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  transition: all 0.15s ease;
+}
+
+body.theme-dark .fan-center-label {
+  background: radial-gradient(circle, rgba(45, 48, 54, 0.95) 0%, rgba(32, 34, 38, 0.88) 100%);
+  color: #ff8c2b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Prompt Banner Above Wheel */
+.wheel-prompt-banner {
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  z-index: 4;
+}
+
+body.theme-dark .wheel-prompt-banner {
+  background: rgba(30, 32, 36, 0.88);
+  color: #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wheel-prompt-banner kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+body.theme-dark .wheel-prompt-banner kbd {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Persian / RTL Specific Rules */
+body.rtl {
+  direction: rtl;
+  font-family: "Vazirmatn", "Tahoma", "Segoe UI", sans-serif;
+}
+
+body.rtl .petal-label {
+  letter-spacing: 0;
+}
+
+body.rtl .fan-center-label {
+  letter-spacing: 0;
+}

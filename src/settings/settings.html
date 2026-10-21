@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tangerine Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="settings-container">
+    <div class="header">
+      <div class="logo-badge">🍊</div>
+      <div class="header-text">
+        <h1 id="txt-title">Tangerine Settings</h1>
+        <p id="txt-tagline">The zero-click offline file converter & quick actions</p>
+      </div>
+    </div>
+
+    <!-- General Settings -->
+    <div class="settings-section">
+      <div class="section-title" id="txt-general">General</div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-title" id="txt-lang-title">Application Language</div>
+          <div class="setting-desc" id="txt-lang-desc">Select your preferred language (English / فارسی)</div>
+        </div>
+        <div class="setting-control">
+          <select id="select-language">
+            <option value="en">English (US)</option>
+            <option value="fa">فارسی (Persian)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-title" id="txt-theme-title">Theme</div>
+          <div class="setting-desc" id="txt-theme-desc">Choose application appearance</div>
+        </div>
+        <div class="setting-control">
+          <select id="select-theme">
+            <option value="system">System Default</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-title" id="txt-sound-title">Acoustic Feedback</div>
+          <div class="setting-desc" id="txt-sound-desc">Play subtle audio click when hovering over petals</div>
+        </div>
+        <div class="setting-control">
+          <label class="switch">
+            <input type="checkbox" id="check-sound" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shortcuts & Trigger Settings -->
+    <div class="settings-section">
+      <div class="section-title" id="txt-shortcuts">Shortcuts & Drag Triggers</div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-title" id="txt-sc-conv">Conversion Wheel Modifier</div>
+          <div class="setting-desc" id="txt-sc-conv-desc">Modifier key while dragging a file in Explorer</div>
+        </div>
+        <div class="setting-control">
+          <select id="select-sc-conv">
+            <option value="Shift">Shift</option>
+            <option value="Alt">Alt</option>
+            <option value="Control">Control</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-title" id="txt-sc-tools">File Tools Modifier</div>
+          <div class="setting-desc" id="txt-sc-tools-desc">Modifier for advanced tools (compress, trim, split)</div>
+        </div>
+        <div class="setting-control">
+          <select id="select-sc-tools">
+            <option value="Alt">Alt</option>
+            <option value="Shift">Shift</option>
+            <option value="Control">Control</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-title" id="txt-sc-act">File Actions Modifier</div>
+          <div class="setting-desc" id="txt-sc-act-desc">Modifier for actions (copy path, terminal, share)</div>
+        </div>
+        <div class="setting-control">
+          <select id="select-sc-act">
+            <option value="Control">Control</option>
+            <option value="Alt">Alt</option>
+            <option value="Shift">Shift</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <button class="btn-primary" id="btn-save">Save Changes</button>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

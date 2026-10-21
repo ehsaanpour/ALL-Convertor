@@ -1,0 +1,29 @@
+{
+  "name": "tangerine-windows",
+  "version": "1.0.0",
+  "description": "The zero-click offline file converter & quick actions for Windows",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test:conversions": "node scripts/test-conversions.js"
+  },
+  "keywords": [
+    "file-converter",
+    "radial-menu",
+    "tangerine",
+    "windows",
+    "quick-actions"
+  ],
+  "author": "Tangerine Windows Team",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "extract-zip": "^2.0.1",
+    "jimp": "^1.6.0",
+    "pdf-lib": "^1.17.1",
+    "tar": "^7.4.3"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0"
+  }
+}

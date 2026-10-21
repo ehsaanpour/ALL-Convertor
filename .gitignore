@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Test data & scratch
+scratch_test_data/
+.config/
+target_evidence/
+
+# Build and distribution
+dist/
+build/
+out/
+*.log
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store

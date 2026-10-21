@@ -1,0 +1,219 @@
+{
+  "appName": "Tangerine",
+  "appTagline": "The zero-click offline file converter & quick actions",
+  "tray": {
+    "openSettings": "Settings...",
+    "showOverlay": "Show Radial Wheel (Test)",
+    "viewConversions": "Recent Conversions",
+    "language": "Language",
+    "exit": "Exit Tangerine"
+  },
+  "settings": {
+    "title": "Tangerine Settings",
+    "general": "General",
+    "shortcuts": "Shortcuts",
+    "conversions": "Conversions",
+    "about": "About",
+    "languageLabel": "Application Language",
+    "languageDesc": "Select your preferred language (English / فارسی)",
+    "themeLabel": "Theme",
+    "themeSystem": "System Default",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "outputDirLabel": "Save Location",
+    "outputDirSame": "Beside original file (Recommended)",
+    "outputDirCustom": "Custom folder...",
+    "soundLabel": "Acoustic Feedback",
+    "soundDesc": "Play subtle audio tick when hovering over petals",
+    "shortcutConversions": "Conversion Wheel Modifier",
+    "shortcutTools": "File Tools Modifier",
+    "shortcutActions": "File Actions Modifier",
+    "dragThresholdLabel": "Drag Sensitivity (Pixels)",
+    "save": "Save Changes",
+    "savedSuccess": "Settings saved successfully!"
+  },
+  "radial": {
+    "shiftPrompt": "Tap Shift on your keyboard",
+    "wheelPrompt": "⇧ Convert · ⌥ Tools · ⌃ Actions",
+    "dropPrompt": "Drop to convert to {target}",
+    "noConversions": "No conversions available for this format",
+    "noTools": "No editing tools available for this format",
+    "chooseAction": "Choose a file action",
+    "chooseTool": "Choose a file tool",
+    "chooseFormat": "Choose a conversion format",
+    "makingFile": "Making {filename}...",
+    "completed": "{filename} — ready!"
+  },
+  "tools": {
+    "compress": {
+      "title": "COMPRESS",
+      "name": "Compress",
+      "desc": "Reduce file size while keeping originals"
+    },
+    "removeMetadata": {
+      "title": "METADATA",
+      "name": "Metadata",
+      "desc": "Edit tags or strip metadata from files"
+    },
+    "editImage": {
+      "title": "EDIT",
+      "name": "Edit Photo",
+      "desc": "Adjust brightness, contrast, and filters"
+    },
+    "annotateImage": {
+      "title": "ANNOTATE",
+      "name": "Annotate Photo",
+      "desc": "Add arrows, text callouts, and shapes"
+    },
+    "frameImage": {
+      "title": "ADD BG",
+      "name": "Add BG",
+      "desc": "Place image on canvas with gradient or solid background"
+    },
+    "cropImage": {
+      "title": "CROP",
+      "name": "Crop Image",
+      "desc": "Crop image to aspect ratio or custom bounds"
+    },
+    "normalizeAudio": {
+      "title": "NORMALIZE",
+      "name": "Normalize Volume",
+      "desc": "Balance loudness across audio files using EBU R128"
+    },
+    "muteVideo": {
+      "title": "MUTE",
+      "name": "Remove Audio",
+      "desc": "Export a clean video copy with audio removed"
+    },
+    "trimVideo": {
+      "title": "TRIM",
+      "name": "Trim Video",
+      "desc": "Cut video from start to end timestamps"
+    },
+    "splitPDF": {
+      "title": "SPLIT",
+      "name": "Split PDF",
+      "desc": "Save each PDF page as an individual file"
+    },
+    "organizePDF": {
+      "title": "ORGANIZE",
+      "name": "Organize PDF",
+      "desc": "Reorder, rotate, or remove pages"
+    },
+    "extractArchive": {
+      "title": "EXTRACT",
+      "name": "Extract Archive",
+      "desc": "Unpack ZIP, TAR, GZ, or RAR archives to a folder"
+    },
+    "createPDF": {
+      "title": "CREATE PDF",
+      "name": "Create PDF",
+      "desc": "Combine selected images into a single PDF document"
+    },
+    "mergePDF": {
+      "title": "MERGE PDF",
+      "name": "Merge PDFs",
+      "desc": "Combine multiple PDF files into one continuous document"
+    },
+    "cropVideo": {
+      "title": "CROP",
+      "name": "Crop Video",
+      "desc": "Crop video frame dimensions"
+    },
+    "changeVideoSpeed": {
+      "title": "SPEED",
+      "name": "Change Video Speed",
+      "desc": "Speed up or slow down video while keeping audio pitch"
+    },
+    "joinVideos": {
+      "title": "JOIN",
+      "name": "Join Videos",
+      "desc": "Concatenate multiple video clips into one"
+    },
+    "videoSnapshots": {
+      "title": "SNAPSHOT",
+      "name": "Video Snapshots",
+      "desc": "Capture high-resolution frames as PNG"
+    },
+    "splitVideo": {
+      "title": "SPLIT",
+      "name": "Split Video",
+      "desc": "Cut video into multiple segments in a folder"
+    },
+    "audioToVideo": {
+      "title": "VISUALIZE",
+      "name": "Audio Visualizer",
+      "desc": "Render animated waveform video from audio"
+    },
+    "trimAudio": {
+      "title": "TRIM",
+      "name": "Trim Audio",
+      "desc": "Trim audio segment and strip leading/trailing silence"
+    },
+    "audioChannels": {
+      "title": "CHANNELS",
+      "name": "Convert Channels",
+      "desc": "Convert audio between mono and stereo"
+    },
+    "createCollage": {
+      "title": "COLLAGE",
+      "name": "Create Collage",
+      "desc": "Combine photos into a neat collage layout"
+    },
+    "redactImage": {
+      "title": "REDACT",
+      "name": "Redact Photo",
+      "desc": "Blur or blackout sensitive information"
+    },
+    "redactVideo": {
+      "title": "REDACT",
+      "name": "Redact Video",
+      "desc": "Blur sensitive areas across video timeline"
+    },
+    "redactAudio": {
+      "title": "BLEEP",
+      "name": "Bleep Audio",
+      "desc": "Mute or bleep sensitive words"
+    }
+  },
+  "actions": {
+    "airDrop": {
+      "title": "SHARE",
+      "name": "Nearby Share",
+      "desc": "Share files using Windows Nearby Share"
+    },
+    "float": {
+      "title": "FLOAT",
+      "name": "Float",
+      "desc": "Keep files in an always-on-top desktop shelf"
+    },
+    "copy": {
+      "title": "COPY",
+      "name": "Copy",
+      "desc": "Copy files to clipboard for pasting in Explorer"
+    },
+    "move": {
+      "title": "MOVE",
+      "name": "Move",
+      "desc": "Move files to a chosen destination folder"
+    },
+    "copyPath": {
+      "title": "COPY PATH",
+      "name": "Copy Path",
+      "desc": "Copy full file paths to clipboard as text"
+    },
+    "openTerminal": {
+      "title": "TERMINAL",
+      "name": "Terminal",
+      "desc": "Open PowerShell / Windows Terminal in this folder"
+    }
+  },
+  "notifications": {
+    "conversionSuccess": "Conversion Complete",
+    "conversionSuccessBody": "{filename} created successfully beside original.",
+    "conversionError": "Conversion Failed",
+    "conversionErrorBody": "Could not convert {filename}: {error}",
+    "openFolder": "Open Folder",
+    "openFile": "Open File"
+  }
+}
