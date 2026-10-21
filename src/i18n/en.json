@@ -30,7 +30,13 @@
     "shortcutActions": "File Actions Modifier",
     "dragThresholdLabel": "Drag Sensitivity (Pixels)",
     "save": "Save Changes",
-    "savedSuccess": "Settings saved successfully!"
+    "savedSuccess": "Settings saved successfully!",
+    "aboutTitle": "About UniFlux",
+    "aboutCreator": "Software created by Ehsan Ehsanpour",
+    "aboutFree": "Using this software is completely free.",
+    "aboutDonate": "If you like it, you can donate to:",
+    "copyAddress": "Copy Address",
+    "copied": "Copied! ✓"
   },
   "radial": {
     "shiftPrompt": "Tap Shift on your keyboard",

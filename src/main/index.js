@@ -259,11 +259,13 @@ class UniFluxApp {
 
     const appIcon = path.join(__dirname, '..', '..', 'assets', 'brand', 'icon.png');
     this.settingsWindow = new BrowserWindow({
-      width: 640,
-      height: 620,
+      width: 660,
+      height: 720,
+      minWidth: 540,
+      minHeight: 580,
       icon: appIcon,
       title: i18n.t('settings.title'),
-      resizable: false,
+      resizable: true,
       autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: true,
