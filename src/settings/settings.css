@@ -204,6 +204,26 @@ body.rtl .footer-bar {
   justify-content: flex-start;
 }
 
+.btn-secondary {
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
 .btn-primary {
   background: var(--accent);
   color: #fff;

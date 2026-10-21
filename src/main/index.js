@@ -47,6 +47,9 @@ class TangerineApp {
     this.setupHookListeners();
     this.setupIpcHandlers();
 
+    // Show settings window on startup so user sees the interface
+    this.openSettingsWindow();
+
     console.log('Tangerine Windows service started successfully in system tray.');
   }
 
@@ -206,6 +209,9 @@ class TangerineApp {
         this.changeLanguage(newConfig.language);
       }
     });
+    ipcMain.on('test-radial-wheel', () => {
+      this.showTestOverlay();
+    });
   }
 
   openSettingsWindow() {
@@ -269,6 +275,8 @@ class TangerineApp {
   }
 }
 
-const tangerine = new TangerineApp();
-globalTangerineInstance = tangerine;
-tangerine.init().catch(console.error);
+if (gotLock) {
+  const tangerine = new TangerineApp();
+  globalTangerineInstance = tangerine;
+  tangerine.init().catch(console.error);
+}

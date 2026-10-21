@@ -9,7 +9,12 @@ const checkSound = document.getElementById('check-sound');
 const selectScConv = document.getElementById('select-sc-conv');
 const selectScTools = document.getElementById('select-sc-tools');
 const selectScAct = document.getElementById('select-sc-act');
+const btnTest = document.getElementById('btn-test');
 const btnSave = document.getElementById('btn-save');
+
+btnTest.addEventListener('click', () => {
+  ipcRenderer.send('test-radial-wheel');
+});
 
 ipcRenderer.on('init-settings', (event, data) => {
   currentConfig = data.config || {};
@@ -51,6 +56,7 @@ function updateTexts(lang) {
   document.getElementById('txt-sc-conv').textContent = s.shortcutConversions || 'Conversions Modifier';
   document.getElementById('txt-sc-tools').textContent = s.shortcutTools || 'Tools Modifier';
   document.getElementById('txt-sc-act').textContent = s.shortcutActions || 'Actions Modifier';
+  btnTest.textContent = isRtl ? 'آزمایش چرخ تبدیل 🎯' : 'Test Radial Wheel 🎯';
   btnSave.textContent = s.save || 'Save Changes';
 }
 
