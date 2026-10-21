@@ -44,7 +44,7 @@ function updateTexts(lang) {
 
   document.body.classList.toggle('rtl', isRtl);
 
-  document.getElementById('txt-title').textContent = s.title || 'Tangerine Settings';
+  document.getElementById('txt-title').textContent = s.title || 'UniFlux Settings';
   document.getElementById('txt-tagline').textContent = dict.appTagline || '';
   document.getElementById('txt-general').textContent = s.general || 'General';
   document.getElementById('txt-lang-title').textContent = s.languageLabel || 'Application Language';

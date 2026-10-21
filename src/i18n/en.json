@@ -1,15 +1,15 @@
 {
-  "appName": "Tangerine",
+  "appName": "UniFlux",
   "appTagline": "The zero-click offline file converter & quick actions",
   "tray": {
     "openSettings": "Settings...",
     "showOverlay": "Show Radial Wheel (Test)",
     "viewConversions": "Recent Conversions",
     "language": "Language",
-    "exit": "Exit Tangerine"
+    "exit": "Exit UniFlux"
   },
   "settings": {
-    "title": "Tangerine Settings",
+    "title": "UniFlux Settings",
     "general": "General",
     "shortcuts": "Shortcuts",
     "conversions": "Conversions",

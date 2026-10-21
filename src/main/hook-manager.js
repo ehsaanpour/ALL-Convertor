@@ -16,10 +16,27 @@ class HookManager extends EventEmitter {
     this.activeModifier = null;
   }
 
+  getHookExecutablePath() {
+    // 1. Packaged extraResources
+    if (process.resourcesPath) {
+      const resourcePath = path.join(process.resourcesPath, 'bin', 'native_hook.exe');
+      if (fs.existsSync(resourcePath)) return resourcePath;
+    }
+    // 2. Unpacked asar
+    const unpackedPath = path.join(__dirname, 'native_hook.exe').replace('app.asar', 'app.asar.unpacked');
+    if (fs.existsSync(unpackedPath)) return unpackedPath;
+
+    // 3. Direct local path
+    const localPath = path.join(__dirname, 'native_hook.exe');
+    if (fs.existsSync(localPath)) return localPath;
+
+    return null;
+  }
+
   start() {
-    const hookExe = path.join(__dirname, 'native_hook.exe');
-    if (!fs.existsSync(hookExe)) {
-      console.warn('native_hook.exe not found at', hookExe);
+    const hookExe = this.getHookExecutablePath();
+    if (!hookExe) {
+      console.warn('native_hook.exe not found');
       return;
     }
 
@@ -46,13 +63,16 @@ class HookManager extends EventEmitter {
       console.log(`Native hook process exited with code ${code}`);
     });
 
-    // Register fallback global shortcut: Ctrl+Shift+T
+    // Register fallback global shortcuts: Ctrl+Shift+U (UniFlux) and Ctrl+Shift+T
     try {
+      globalShortcut.register('CommandOrControl+Shift+U', () => {
+        this.emit('summon_hotkey', { mode: 'conversions' });
+      });
       globalShortcut.register('CommandOrControl+Shift+T', () => {
         this.emit('summon_hotkey', { mode: 'conversions' });
       });
     } catch (err) {
-      console.warn('Could not register fallback global shortcut', err.message);
+      console.warn('Could not register fallback global shortcuts', err.message);
     }
   }
 

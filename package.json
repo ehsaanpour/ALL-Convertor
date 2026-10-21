@@ -1,20 +1,30 @@
 {
-  "name": "tangerine-windows",
+  "name": "uniflux",
+  "productName": "UniFlux",
   "version": "1.0.0",
-  "description": "The zero-click offline file converter & quick actions for Windows",
+  "description": "UniFlux — The zero-click offline file converter & quick actions for Windows",
   "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
-    "test:conversions": "node scripts/test-conversions.js"
+    "test:conversions": "node scripts/test-conversions.js",
+    "generate:icons": "node scripts/generate-icons.js",
+    "build:native": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe' /target:winexe /out:src\\main\\native_hook.exe src\\main\\native_hook.cs\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win",
+    "dist:win:x64": "electron-builder --win --x64",
+    "dist:win:ia32": "electron-builder --win --ia32",
+    "dist:win:arm64": "electron-builder --win --arm64",
+    "dist:win:all": "electron-builder --win --x64 --ia32 --arm64"
   },
   "keywords": [
+    "uniflux",
     "file-converter",
     "radial-menu",
-    "tangerine",
+    "offline-converter",
     "windows",
     "quick-actions"
   ],
-  "author": "Tangerine Windows Team",
+  "author": "UniFlux Team",
   "license": "MIT",
   "dependencies": {
     "archiver": "^7.0.1",
@@ -24,6 +34,79 @@
     "tar": "^7.4.3"
   },
   "devDependencies": {
-    "electron": "^34.2.0"
+    "electron": "^34.2.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.uniflux.desktop",
+    "productName": "UniFlux",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "src/main/native_hook.exe",
+        "to": "bin/native_hook.exe"
+      },
+      {
+        "from": "src/main/get_selected_files.ps1",
+        "to": "bin/get_selected_files.ps1"
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/native_hook.exe",
+      "**/get_selected_files.ps1"
+    ],
+    "win": {
+      "icon": "assets/brand/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "UniFlux",
+      "uninstallDisplayName": "UniFlux",
+      "installerIcon": "assets/brand/icon.ico",
+      "uninstallerIcon": "assets/brand/icon.ico",
+      "installerHeaderIcon": "assets/brand/icon.ico",
+      "artifactName": "UniFlux-${version}-Windows-${arch}-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "UniFlux-${version}-Windows-${arch}-Portable.${ext}"
+    }
   }
 }

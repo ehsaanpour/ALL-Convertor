@@ -15,19 +15,19 @@ const { getFileActions } = require('../engine/actions-registry');
 // Single instance lock
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
-  console.log('Tangerine is already running in your system tray. Focused existing window.');
+  console.log('UniFlux is already running in your system tray. Focused existing window.');
   app.quit();
 } else {
   app.on('second-instance', () => {
-    if (globalTangerineInstance) {
-      globalTangerineInstance.openSettingsWindow();
+    if (globalUniFluxInstance) {
+      globalUniFluxInstance.openSettingsWindow();
     }
   });
 }
 
-let globalTangerineInstance = null;
+let globalUniFluxInstance = null;
 
-class TangerineApp {
+class UniFluxApp {
   constructor() {
     this.overlayWindow = null;
     this.settingsWindow = null;
@@ -51,18 +51,20 @@ class TangerineApp {
     // Show settings window on startup so user sees the interface
     this.openSettingsWindow();
 
-    console.log('Tangerine Windows service started successfully in system tray.');
+    console.log('UniFlux Windows service started successfully in system tray.');
   }
 
   createOverlayWindow() {
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.bounds;
+    const appIcon = path.join(__dirname, '..', '..', 'assets', 'brand', 'icon.png');
 
     this.overlayWindow = new BrowserWindow({
       x: 0,
       y: 0,
       width,
       height,
+      icon: appIcon,
       transparent: true,
       frame: false,
       alwaysOnTop: true,
@@ -176,7 +178,7 @@ class TangerineApp {
   }
 
   async getFallbackSampleFile() {
-    const sampleDir = path.join(app.getPath('temp'), 'tangerine_samples');
+    const sampleDir = path.join(app.getPath('temp'), 'uniflux_samples');
     if (!fs.existsSync(sampleDir)) fs.mkdirSync(sampleDir, { recursive: true });
     const samplePath = path.join(sampleDir, 'sample_photo.jpg');
     if (!fs.existsSync(samplePath) || fs.statSync(samplePath).size < 100) {
@@ -255,9 +257,11 @@ class TangerineApp {
       return;
     }
 
+    const appIcon = path.join(__dirname, '..', '..', 'assets', 'brand', 'icon.png');
     this.settingsWindow = new BrowserWindow({
       width: 640,
       height: 620,
+      icon: appIcon,
       title: i18n.t('settings.title'),
       resizable: false,
       autoHideMenuBar: true,
@@ -312,7 +316,7 @@ class TangerineApp {
 }
 
 if (gotLock) {
-  const tangerine = new TangerineApp();
-  globalTangerineInstance = tangerine;
-  tangerine.init().catch(console.error);
+  const uniflux = new UniFluxApp();
+  globalUniFluxInstance = uniflux;
+  uniflux.init().catch(console.error);
 }

@@ -1,15 +1,15 @@
 {
-  "appName": "تانجرین",
+  "appName": "UniFlux",
   "appTagline": "مبدل فایل بدون کلیک و ابزارهای سریع برای ویندوز",
   "tray": {
     "openSettings": "تنظیمات...",
     "showOverlay": "نمایش چرخ تبدیل (آزمایشی)",
     "viewConversions": "تبدیل‌های اخیر",
     "language": "زبان (Language)",
-    "exit": "خروج از تانجرین"
+    "exit": "خروج از UniFlux"
   },
   "settings": {
-    "title": "تنظیمات تانجرین",
+    "title": "تنظیمات UniFlux",
     "general": "عمومی",
     "shortcuts": "کلیدهای میانبر",
     "conversions": "تبدیل‌ها",

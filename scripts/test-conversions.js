@@ -11,7 +11,7 @@ const ffmpegWorker = require('../src/engine/ffmpeg-worker');
 const { Jimp } = require('jimp');
 
 async function runAllTests() {
-  console.log('=== Tangerine Windows Verification Test Suite ===\n');
+  console.log('=== UniFlux Windows Verification Test Suite ===\n');
 
   const testDir = path.join(__dirname, '..', 'scratch_test_data');
   if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
@@ -56,7 +56,7 @@ async function runAllTests() {
   // 3. Subtitle Converter Tests
   console.log('\n--- 3. Subtitle Conversion Tests ---');
   const sampleSrt = path.join(testDir, 'sample.srt');
-  fs.writeFileSync(sampleSrt, '1\n00:00:01,000 --> 00:00:04,000\nHello from Tangerine!\n');
+  fs.writeFileSync(sampleSrt, '1\n00:00:01,000 --> 00:00:04,000\nHello from UniFlux!\n');
   const sampleVtt = path.join(testDir, 'sample.vtt');
   subtitleWorker.convertSubtitle(sampleSrt, sampleVtt, 'vtt');
   const vttContent = fs.readFileSync(sampleVtt, 'utf8');
@@ -65,7 +65,7 @@ async function runAllTests() {
   const sampleTxt = path.join(testDir, 'sample.txt');
   subtitleWorker.convertSubtitle(sampleSrt, sampleTxt, 'txt');
   const txtContent = fs.readFileSync(sampleTxt, 'utf8');
-  assert(txtContent.trim() === 'Hello from Tangerine!', 'SRT to plain TXT dialogue extraction success');
+  assert(txtContent.trim() === 'Hello from UniFlux!', 'SRT to plain TXT dialogue extraction success');
 
   // 4. Image Processing Tests
   console.log('\n--- 4. Image Worker Tests ---');

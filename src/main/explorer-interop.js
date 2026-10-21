@@ -4,10 +4,21 @@ const fs = require('fs');
 
 class ExplorerInterop {
   constructor() {
-    this.scriptPath = path.join(__dirname, 'get_selected_files.ps1');
+    this.scriptPath = this.getScriptPath();
     this.lastKnownFiles = [];
     this.lastKnownTimestamp = 0;
     this.CACHE_TTL_MS = 3500; // 3.5 seconds TTL
+  }
+
+  getScriptPath() {
+    if (process.resourcesPath) {
+      const resourcePath = path.join(process.resourcesPath, 'bin', 'get_selected_files.ps1');
+      if (fs.existsSync(resourcePath)) return resourcePath;
+    }
+    const unpackedPath = path.join(__dirname, 'get_selected_files.ps1').replace('app.asar', 'app.asar.unpacked');
+    if (fs.existsSync(unpackedPath)) return unpackedPath;
+
+    return path.join(__dirname, 'get_selected_files.ps1');
   }
 
   getSelectedFiles(options = {}) {

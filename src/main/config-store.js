@@ -5,7 +5,15 @@ const { app } = require('electron');
 class ConfigStore {
   constructor() {
     this.userDataPath = app ? app.getPath('userData') : path.join(process.cwd(), '.config');
-    this.configFilePath = path.join(this.userDataPath, 'tangerine_config.json');
+    this.configFilePath = path.join(this.userDataPath, 'uniflux_config.json');
+    const legacyPath = path.join(this.userDataPath, 'tangerine_config.json');
+    if (!fs.existsSync(this.configFilePath) && fs.existsSync(legacyPath)) {
+      try {
+        fs.copyFileSync(legacyPath, this.configFilePath);
+      } catch {
+        // Fallback silently
+      }
+    }
     this.defaults = {
       language: 'en',
       soundEnabled: true,

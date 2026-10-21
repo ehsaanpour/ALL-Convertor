@@ -1,0 +1,151 @@
+name: Windows Multi-Architecture Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      draft:
+        description: 'Create Draft Release'
+        type: boolean
+        required: false
+        default: false
+      prerelease:
+        description: 'Mark as Pre-release'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows (${{ matrix.arch }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, ia32, arm64]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Compile C# Native Low-Level Hook
+        run: npm run build:native
+
+      - name: Run UniFlux Conversion Verification Tests
+        run: npm run test:conversions
+
+      - name: Generate High-Fidelity Brand Icons & Assets
+        run: npm run generate:icons
+
+      - name: Package Windows ${{ matrix.arch }} (NSIS, Portable, ZIP)
+        run: npx electron-builder --win --${{ matrix.arch }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ${{ matrix.arch }} Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: uniflux-windows-${{ matrix.arch }}
+          path: |
+            dist/*.exe
+            dist/*.zip
+            dist/*.blockmap
+            !dist/*-unpacked/**
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-release:
+    name: Publish Multi-Architecture GitHub Release
+    needs: [build-windows]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Release Directory
+        run: New-Item -ItemType Directory -Path release_assets -Force
+
+      - name: Download Windows x64 Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: uniflux-windows-x64
+          path: release_assets
+
+      - name: Download Windows ia32 Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: uniflux-windows-ia32
+          path: release_assets
+
+      - name: Download Windows arm64 Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: uniflux-windows-arm64
+          path: release_assets
+
+      - name: Compute Cryptographic SHA256 Checksums
+        id: checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path release_assets -Include *.exe,*.zip -Recurse | ForEach-Object {
+            $hash = (Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash
+            "$hash  $($_.Name)"
+          } | Out-File -FilePath release_assets/SHA256SUMS.txt -Encoding utf8
+          Get-Content release_assets/SHA256SUMS.txt
+
+      - name: Determine Release Tag
+        id: release_info
+        shell: pwsh
+        run: |
+          $tag = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { "${{ github.event.inputs.tag_name }}" }
+          if (-not $tag) { $tag = "v1.0.0" }
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+
+      - name: Publish Release to GitHub Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_info.outputs.tag }}
+          name: UniFlux ${{ steps.release_info.outputs.tag }} ⚡
+          body: |
+            ## UniFlux ${{ steps.release_info.outputs.tag }} for Windows ⚡
+
+            The zero-click offline file converter & radial quick actions for all Windows editions and architectures.
+
+            ### 📦 Release Assets & Supported Windows Versions:
+            | Architecture | Editions Supported | Asset Formats |
+            | :--- | :--- | :--- |
+            | **Windows x64** | Windows 11 & Windows 10 (64-bit) | Setup Installer (`.exe`), Standalone Portable (`.exe`), Standalone Archive (`.zip`) |
+            | **Windows ia32** | Windows 7, 8, 8.1, 10 (32-bit legacy) | Setup Installer (`.exe`), Standalone Portable (`.exe`), Standalone Archive (`.zip`) |
+            | **Windows ARM64** | Windows 11 on ARM (Copilot+ PCs, Snapdragon X Elite, Surface Pro) | Setup Installer (`.exe`), Standalone Portable (`.exe`), Standalone Archive (`.zip`) |
+
+            ### 🔒 Integrity & Security:
+            - Cryptographic SHA-256 hashes are listed in `SHA256SUMS.txt`.
+            - All builds are packaged with self-contained dependencies and offline execution capability.
+          files: |
+            release_assets/*.exe
+            release_assets/*.zip
+            release_assets/SHA256SUMS.txt
+          draft: ${{ github.event.inputs.draft || false }}
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

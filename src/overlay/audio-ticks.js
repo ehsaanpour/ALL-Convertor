@@ -29,7 +29,7 @@ class AudioTickPlayer {
       const osc = this.audioCtx.createOscillator();
       const gain = this.audioCtx.createGain();
 
-      // Tangerine-style crisp high-frequency acoustic transient
+      // UniFlux crisp high-frequency acoustic transient
       osc.type = 'sine';
       osc.frequency.setValueAtTime(1400, this.audioCtx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(400, this.audioCtx.currentTime + 0.025);

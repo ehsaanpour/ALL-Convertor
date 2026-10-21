@@ -73,7 +73,7 @@ class TrayManager {
       const notif = new Notification({
         title,
         body,
-        icon: path.join(__dirname, '..', '..', 'assets', 'brand', 'tray.png')
+        icon: path.join(__dirname, '..', '..', 'assets', 'brand', 'icon.png')
       });
 
       if (targetFilePath) {
