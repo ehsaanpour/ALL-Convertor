@@ -15,6 +15,7 @@ const { getFileActions } = require('../engine/actions-registry');
 // Single instance lock
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
+  console.log('Tangerine is already running in your system tray. Focused existing window.');
   app.quit();
 } else {
   app.on('second-instance', () => {
