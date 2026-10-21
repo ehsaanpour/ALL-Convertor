@@ -48,9 +48,10 @@ class ConversionManager extends EventEmitter {
         resultPath = subtitleWorker.convertSubtitle(inputPath, outputPath, target);
       } else if (category === 'archive') {
         resultPath = await archiveWorker.createArchive([inputPath], outputPath, target);
+      } else if (target === 'zip' || target === 'tar' || target === 'gz') {
+        resultPath = await archiveWorker.createArchive([inputPath], outputPath, target);
       } else {
-        // Fallback to FFmpeg generic
-        resultPath = await ffmpegWorker.convertMedia(inputPath, outputPath, target);
+        throw new Error(`File format .${srcExt || 'unknown'} cannot be converted to .${target}. Supported action: compress to ZIP or select an action.`);
       }
 
       this.emit('job:done', { jobId, inputPath, outputPath: resultPath, target });

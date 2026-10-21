@@ -192,6 +192,37 @@ window.addEventListener('mouseup', () => {
   }
 });
 
+// HTML5 Native Drag & Drop support
+window.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  if (radialWrapper.classList.contains('hidden')) return;
+
+  const rect = radialWrapper.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const dx = e.clientX - centerX;
+  const dy = e.clientY - centerY;
+
+  const hitIdx = Ke(dx, dy, currentTargets.length);
+  highlightPetal(hitIdx);
+});
+
+window.addEventListener('drop', (e) => {
+  e.preventDefault();
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    const dropped = Array.from(e.dataTransfer.files).map(f => f.path).filter(Boolean);
+    if (dropped.length > 0) {
+      currentFiles = dropped;
+    }
+  }
+
+  if (!radialWrapper.classList.contains('hidden') && selectedIndex !== null) {
+    executeTarget(selectedIndex);
+  }
+});
+
 promptBanner.querySelectorAll('.tab-btn').forEach((btn) => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();

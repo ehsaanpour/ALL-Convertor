@@ -61,6 +61,8 @@ function getConversionTargets(ext) {
     targets = [...SUBTITLE_FORMATS, 'txt'];
   } else if (ARCHIVE_FORMATS.includes(e)) {
     targets = ['zip', 'tar', 'gz'];
+  } else if (e) {
+    targets = ['zip'];
   }
 
   // Filter out self and input-only types

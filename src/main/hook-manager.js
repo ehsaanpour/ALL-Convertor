@@ -62,7 +62,7 @@ class HookManager extends EventEmitter {
         this.isDragging = true;
         this.lastX = data.x;
         this.lastY = data.y;
-        this.emit('drag_start', { x: data.x, y: data.y });
+        this.emit('drag_start', { x: data.x, y: data.y, context: data.context, hwnd: data.hwnd });
         break;
 
       case 'drag_move':
@@ -95,7 +95,9 @@ class HookManager extends EventEmitter {
             key: data.key,
             dragging: data.dragging,
             x: data.x,
-            y: data.y
+            y: data.y,
+            context: data.context,
+            hwnd: data.hwnd
           });
         }
         break;

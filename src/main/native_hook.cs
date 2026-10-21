@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 
 namespace TangerineNativeHook
@@ -85,6 +86,59 @@ namespace TangerineNativeHook
         private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+        private static string GetWindowClass(IntPtr hwnd)
+        {
+            if (hwnd == IntPtr.Zero) return string.Empty;
+            StringBuilder sb = new StringBuilder(256);
+            GetClassName(hwnd, sb, sb.Capacity);
+            return sb.ToString();
+        }
+
+        private static void GetWindowContext(POINT pt, out string context, out long hwnd)
+        {
+            context = "unknown";
+            hwnd = 0;
+
+            try
+            {
+                IntPtr wnd = WindowFromPoint(pt);
+                IntPtr root = GetAncestor(wnd, 2); // GA_ROOT = 2
+                string wndClass = GetWindowClass(wnd);
+                string rootClass = GetWindowClass(root);
+
+                if (rootClass == "Progman" || rootClass == "WorkerW" || wndClass == "SHELLDLL_DefView" || wndClass == "SysListView32")
+                {
+                    context = "desktop";
+                    hwnd = 0;
+                    return;
+                }
+
+                if (rootClass == "CabinetWClass")
+                {
+                    context = "explorer";
+                    hwnd = root.ToInt64();
+                    return;
+                }
+
+                // Check foreground window as fallback
+                IntPtr fg = GetForegroundWindow();
+                string fgClass = GetWindowClass(fg);
+                if (fgClass == "Progman" || fgClass == "WorkerW")
+                {
+                    context = "desktop";
+                    hwnd = 0;
+                    return;
+                }
+                if (fgClass == "CabinetWClass")
+                {
+                    context = "explorer";
+                    hwnd = fg.ToInt64();
+                    return;
+                }
+            }
+            catch {}
+        }
+
         private static IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0)
@@ -113,7 +167,11 @@ namespace TangerineNativeHook
                         if (dx > _dragThreshold || dy > _dragThreshold)
                         {
                             _isDragging = true;
-                            Console.WriteLine(string.Format("{{\"event\":\"drag_start\",\"x\":{0},\"y\":{1}}}", _currentX, _currentY));
+                            string ctx;
+                            long ctxHwnd;
+                            GetWindowContext(hookStruct.pt, out ctx, out ctxHwnd);
+                            Console.WriteLine(string.Format("{{\"event\":\"drag_start\",\"x\":{0},\"y\":{1},\"context\":\"{2}\",\"hwnd\":{3}}}",
+                                _currentX, _currentY, ctx, ctxHwnd));
                             Console.Out.Flush();
                         }
                     }
@@ -161,8 +219,13 @@ namespace TangerineNativeHook
                         }
 
                         bool userIsDragging = _isDragging || _isLeftMouseDown;
-                        Console.WriteLine(string.Format("{{\"event\":\"key_down\",\"key\":\"{0}\",\"dragging\":{1},\"x\":{2},\"y\":{3}}}",
-                            key, userIsDragging ? "true" : "false", _currentX, _currentY));
+                        string ctx;
+                        long ctxHwnd;
+                        POINT queryPt = new POINT { x = _currentX, y = _currentY };
+                        GetWindowContext(queryPt, out ctx, out ctxHwnd);
+
+                        Console.WriteLine(string.Format("{{\"event\":\"key_down\",\"key\":\"{0}\",\"dragging\":{1},\"x\":{2},\"y\":{3},\"context\":\"{4}\",\"hwnd\":{5}}}",
+                            key, userIsDragging ? "true" : "false", _currentX, _currentY, ctx, ctxHwnd));
                         Console.Out.Flush();
                     }
                 }
@@ -202,6 +265,18 @@ namespace TangerineNativeHook
 
         [DllImport("user32.dll")]
         private static extern bool GetCursorPos(out POINT lpPoint);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr WindowFromPoint(POINT Point);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetAncestor(IntPtr hwnd, uint gaFlags);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);

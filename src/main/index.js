@@ -86,16 +86,16 @@ class TangerineApp {
   }
 
   setupHookListeners() {
-    // Pre-fetch active Explorer selection when drag starts
-    this.hookManager.on('drag_start', () => {
-      explorerInterop.getSelectedFiles().catch(() => {});
+    // Pre-fetch active Explorer/Desktop selection when drag starts
+    this.hookManager.on('drag_start', (data) => {
+      explorerInterop.getSelectedFiles({ context: data && data.context, hwnd: data && data.hwnd }).catch(() => {});
     });
 
     // When modifier is pressed during drag or triggered
     this.hookManager.on('trigger', async (data) => {
       const cursor = screen.getCursorScreenPoint();
       const coords = { x: (data && data.x > 0) ? data.x : cursor.x, y: (data && data.y > 0) ? data.y : cursor.y };
-      await this.displayRadialWheel(data.mode, coords);
+      await this.displayRadialWheel(data.mode, coords, null, { context: data && data.context, hwnd: data && data.hwnd });
     });
 
     // Fallback summon via hotkey
@@ -112,16 +112,17 @@ class TangerineApp {
     });
   }
 
-  async displayRadialWheel(mode, coords, explicitFiles = null) {
+  async displayRadialWheel(mode, coords, explicitFiles = null, winContext = null) {
     if (!this.overlayWindow) return;
 
-    // Use explicitFiles if provided, otherwise query active files from Windows Explorer
+    // Use explicitFiles if provided, otherwise query active files from Desktop / Windows Explorer
     let activeFiles = explicitFiles;
     if (!activeFiles || !activeFiles.length) {
-      const selectedFiles = await explorerInterop.getSelectedFiles();
-      activeFiles = selectedFiles.length > 0 ? selectedFiles : [this.getFallbackSampleFile()];
+      const selectedFiles = await explorerInterop.getSelectedFiles(winContext || {});
+      activeFiles = selectedFiles.length > 0 ? selectedFiles : [await this.getFallbackSampleFile()];
     }
 
+    this.lastWheelFiles = activeFiles;
     const firstFile = activeFiles[0];
     const ext = normalizeExtension(path.extname(firstFile));
 
@@ -139,7 +140,7 @@ class TangerineApp {
       labels = targets.map((a) => i18n.t(`actions.${a}.title`));
     }
 
-    // Fallback: If targets is empty (e.g. non-convertible file format or empty selection), NEVER show an empty wheel!
+    // Fallback: If targets is empty, ensure Actions or standard targets are shown
     if (!targets || !targets.length) {
       if (mode === 'actions') {
         targets = getFileActions();
@@ -174,13 +175,19 @@ class TangerineApp {
     this.overlayWindow.webContents.send('render-wheel', payload);
   }
 
-  getFallbackSampleFile() {
+  async getFallbackSampleFile() {
     const sampleDir = path.join(app.getPath('temp'), 'tangerine_samples');
     if (!fs.existsSync(sampleDir)) fs.mkdirSync(sampleDir, { recursive: true });
     const samplePath = path.join(sampleDir, 'sample_photo.jpg');
-    if (!fs.existsSync(samplePath)) {
-      // Create empty 1-byte file as placeholder
-      fs.writeFileSync(samplePath, Buffer.from([0xff, 0xd8, 0xff, 0xe0]));
+    if (!fs.existsSync(samplePath) || fs.statSync(samplePath).size < 100) {
+      try {
+        const { Jimp } = require('jimp');
+        const img = new Jimp({ width: 300, height: 300, color: 0xff7a00ff });
+        await img.write(samplePath);
+      } catch {
+        const minimalJpgBase64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+        fs.writeFileSync(samplePath, Buffer.from(minimalJpgBase64, 'base64'));
+      }
     }
     return samplePath;
   }
@@ -223,6 +230,7 @@ class TangerineApp {
 
     ipcMain.on('hide-overlay-window', () => {
       if (this.overlayWindow) this.overlayWindow.hide();
+      explorerInterop.clearCache();
     });
 
     ipcMain.on('save-settings', (event, newConfig) => {
@@ -231,13 +239,13 @@ class TangerineApp {
         this.changeLanguage(newConfig.language);
       }
     });
-    ipcMain.on('test-radial-wheel', () => {
-      this.showTestOverlay();
+    ipcMain.on('test-radial-wheel', async () => {
+      await this.showTestOverlay();
     });
 
     ipcMain.on('switch-wheel-mode', (event, newMode) => {
       const cursor = screen.getCursorScreenPoint();
-      this.displayRadialWheel(newMode, cursor);
+      this.displayRadialWheel(newMode, cursor, this.lastWheelFiles);
     });
   }
 
@@ -276,9 +284,10 @@ class TangerineApp {
     });
   }
 
-  showTestOverlay() {
+  async showTestOverlay() {
     const cursor = screen.getCursorScreenPoint();
-    this.displayRadialWheel('conversions', cursor, [this.getFallbackSampleFile()]);
+    const sample = await this.getFallbackSampleFile();
+    this.displayRadialWheel('conversions', cursor, [sample]);
   }
 
   changeLanguage(lang) {

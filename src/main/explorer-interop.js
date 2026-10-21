@@ -6,24 +6,34 @@ class ExplorerInterop {
   constructor() {
     this.scriptPath = path.join(__dirname, 'get_selected_files.ps1');
     this.lastKnownFiles = [];
+    this.lastKnownTimestamp = 0;
+    this.CACHE_TTL_MS = 3500; // 3.5 seconds TTL
   }
 
-  getSelectedFiles() {
+  getSelectedFiles(options = {}) {
     return new Promise((resolve) => {
+      const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', this.scriptPath];
+      if (options.context) {
+        args.push('-context', String(options.context));
+      }
+      if (options.hwnd) {
+        args.push('-targetHwnd', String(options.hwnd));
+      }
+
       execFile(
         'powershell.exe',
-        ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', this.scriptPath],
+        args,
         { timeout: 1500 },
         (error, stdout) => {
           if (error || !stdout) {
-            resolve(this.lastKnownFiles);
+            resolve(this.getFreshCachedFiles());
             return;
           }
 
           try {
             const raw = stdout.trim();
             if (!raw || raw === '[]') {
-              resolve(this.lastKnownFiles);
+              resolve(this.getFreshCachedFiles());
               return;
             }
 
@@ -32,23 +42,36 @@ class ExplorerInterop {
             const validFiles = files.filter((f) => typeof f === 'string' && fs.existsSync(f));
 
             if (validFiles.length > 0) {
-              this.lastKnownFiles = validFiles;
+              this.setLastKnownFiles(validFiles);
               resolve(validFiles);
             } else {
-              resolve(this.lastKnownFiles);
+              resolve(this.getFreshCachedFiles());
             }
           } catch {
-            resolve(this.lastKnownFiles);
+            resolve(this.getFreshCachedFiles());
           }
         }
       );
     });
   }
 
+  getFreshCachedFiles() {
+    if (Date.now() - this.lastKnownTimestamp < this.CACHE_TTL_MS) {
+      return this.lastKnownFiles.filter((f) => fs.existsSync(f));
+    }
+    return [];
+  }
+
   setLastKnownFiles(files) {
     if (Array.isArray(files) && files.length > 0) {
       this.lastKnownFiles = files.filter((f) => fs.existsSync(f));
+      this.lastKnownTimestamp = Date.now();
     }
+  }
+
+  clearCache() {
+    this.lastKnownFiles = [];
+    this.lastKnownTimestamp = 0;
   }
 }
 
