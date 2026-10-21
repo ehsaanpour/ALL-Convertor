@@ -16,8 +16,15 @@ const { getFileActions } = require('../engine/actions-registry');
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
-  process.exit(0);
+} else {
+  app.on('second-instance', () => {
+    if (globalTangerineInstance) {
+      globalTangerineInstance.openSettingsWindow();
+    }
+  });
 }
+
+let globalTangerineInstance = null;
 
 class TangerineApp {
   constructor() {
@@ -263,4 +270,5 @@ class TangerineApp {
 }
 
 const tangerine = new TangerineApp();
+globalTangerineInstance = tangerine;
 tangerine.init().catch(console.error);
